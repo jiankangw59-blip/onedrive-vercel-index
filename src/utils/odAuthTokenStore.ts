@@ -98,6 +98,14 @@ async function runCommand(command: RedisCommand): Promise<unknown> {
   throw new Error('No usable Redis storage configuration is present.')
 }
 
+/**
+ * Execute a harmless command so scheduled health checks count as database activity.
+ */
+export async function pingOdAuthStorage(): Promise<void> {
+  const result = await runCommand(['PING'])
+  if (result !== 'PONG') throw new Error('Redis did not return PONG.')
+}
+
 export async function getOdAuthTokens(): Promise<{ accessToken: unknown; refreshToken: unknown }> {
   const [accessToken, refreshToken] = await Promise.all([
     runCommand(['GET', tokenKey('access_token')]),

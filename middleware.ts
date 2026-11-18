@@ -33,10 +33,15 @@ async function verifyCookie(value: string, secret: string) {
 export async function middleware(request: NextRequest) {
   const passwordHash = process.env.SITE_ACCESS_PASSWORD_HASH
   const cookieSecret = process.env.SITE_ACCESS_COOKIE_SECRET
+  const pathname = request.nextUrl.pathname.replace(/\/$/, '')
 
   // The gate is opt-in so local development remains usable before deployment variables are set.
   if (!passwordHash || !cookieSecret) return NextResponse.next()
-  if (request.nextUrl.pathname === '/site-login' || request.nextUrl.pathname === '/api/site-auth') {
+  if (
+    pathname === '/site-login' ||
+    pathname === '/api/site-auth' ||
+    pathname === '/api/cron/redis-keepalive'
+  ) {
     return NextResponse.next()
   }
 
